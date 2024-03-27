@@ -1,0 +1,1123 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://faisalmemon.github.io/the-road-to-zero/KernelBugHunting/">
+      
+      
+        <link rel="prev" href="../AttackSurface/">
+      
+      
+        <link rel="next" href="../Bibliography/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.15">
+    
+    
+      
+        <title>Kernel Bug Hunting - The Road to Zero</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e359304.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kernel-bug-hunting" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="The Road to Zero" class="md-header__button md-logo" aria-label="The Road to Zero" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Road to Zero
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Kernel Bug Hunting
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/faisalmemon/the-road-to-zero/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="The Road to Zero" class="md-nav__button md-logo" aria-label="The Road to Zero" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    The Road to Zero
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/faisalmemon/the-road-to-zero/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Author/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ZeroDay/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Zero Day
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Hammer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The Hammer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Mach/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mach Programming
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../KernelDebugging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kernel Debugging
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../JailbreakSetup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jailbreak Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../InspectingMobileSafari/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Inspecting Mobile Safari
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Leveraging/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Leveraging Research
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Defense/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    iOS Defense Mechanisms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AttackSurface/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Attack Surface
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Kernel Bug Hunting
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Kernel Bug Hunting
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Concepts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sample Visualization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample Visualization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specific-rule-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specific rule approach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Batch Queries
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outline-of-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      Outline of Approach
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#software-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Software Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-the-apple-proprietary-base-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install the Apple Proprietary base software
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-xnu-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build XNU kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-visual-studio-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup Visual Studio Code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-codeql-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install CodeQL CLI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-the-xnu-codeql-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create the XNU CodeQL Database
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-the-xnu-codeql-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import the XNU CodeQL Database
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run a Query
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-batch-of-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run a Batch of Queries
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Bibliography/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bibliography
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Concepts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sample Visualization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sample Visualization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specific-rule-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specific rule approach
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batch-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Batch Queries
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#outline-of-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      Outline of Approach
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#software-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Software Requirements
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-the-apple-proprietary-base-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install the Apple Proprietary base software
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-xnu-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build XNU kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup-visual-studio-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup Visual Studio Code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-codeql-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install CodeQL CLI
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-the-xnu-codeql-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create the XNU CodeQL Database
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-the-xnu-codeql-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import the XNU CodeQL Database
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run a Query
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-batch-of-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Run a Batch of Queries
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="kernel-bug-hunting">Kernel Bug Hunting</h1>
+<p>It is generally the case that the barriers to finding and exploiting are getting higher.  But there is good news also.
+In this chapter we describe how to use an automated approach to finding vulnerabilities in the XNU kernel.</p>
+<h2 id="basic-concepts">Basic Concepts</h2>
+<p>The GitHub site provides a service which statically analyses code for known coding errors and bad practices, security being
+a subset of such analysis rules.  The underlying tool chain, called CodeQL, provides the mechanism where a structured rule
+can be used to parse the syntax tree of a compiled program.</p>
+<p>In this chapter we show how the XNU kernel and be compiled, and from this a database can be constructed.  Then CodeQL queries
+can be run against it to automatically find bad practices and security sensitive issues.</p>
+<h2 id="sample-visualization">Sample Visualization</h2>
+<p>Before we get into the details of what we are setting up, let's jump into what we can expect to end up with.
+We will go into the details of setup and configuration in a later section, but it makes more sense to first understand
+the approach and benefits we shall gain from using CodeQL.</p>
+<p>We can either run a specific rule, to find code references that match the rule, or we can run a batch of queries
+given a set of rules.</p>
+<h3 id="specific-rule-approach">Specific rule approach</h3>
+<p>We start with checking for code which has an if-clause but then has an empty block of C++ code that is invoked when
+the condition matches.  For example:
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ret</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ERROR_NOT_ALLOWED</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="c1">// No code in here.  e.g. missing error handling code?</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>When looking for such data, our overall Visual Studio Code setup will look like:</p>
+<p><img alt="OverallExample" src="../overallExample.png" /></p>
+<p>The workflow is to select a snippet to query for.  Here we picked one that looks for empty blocks:</p>
+<p><img alt="PickASnippet" src="../pickingASnippet.png" /></p>
+<p>Then we right-click to get the context menu and select the "Run Query" option:</p>
+<p><img alt="RightClickRunQuery" src="../rightClickRunQuery.png" /></p>
+<p>Lastly, we inspect the matched source code files:</p>
+<p><img alt="InspectSourceFile" src="../matchInSourceCode.png" /></p>
+<h3 id="batch-queries">Batch Queries</h3>
+<p>If we update the workspace file <code>vscode-codeql-starter.code-workspace</code> to first have increased querying capability:
+<div class="highlight"><pre><span></span><code> &quot;settings&quot;: {
+    &quot;omnisharp.autoStart&quot;: false,
+    &quot;codeQL.runningQueries.maxQueries&quot;: 128
+  }
+</code></pre></div></p>
+<p>then we can Right Click on a directory level to run all the <code>.ql</code> files underneath.  We can for example select the
+<code>vscode-codeql-starter/ql/cpp/ql/src/Security/CWE</code> directory and then run all the Security-related queries.  This takes
+a few minutes on a powerful Mac.  But it is still quicker than a manual inspection! </p>
+<p>Unfortunately, as of <code>xnu-8792.61.2</code> there are no matches for any of the 64 rules underneath <code>Security/CWE</code>.</p>
+<p>This is probably because Apple, or perhaps a third-party collaborator, has been running CodeQL as part
+of a Continuous Integration pipeline.</p>
+<p>Nevertheless, as we have shown, an empty block in the code might allude to a missing error handling case.  So the
+less interesting rules might turn up security vulnerabilities or give us ideas for how to write a new rule.  These
+private rules would not be part of the CI test set that Apple run.  So there is a real opportunity to find new
+weaknesses or helpful bugs.</p>
+<h2 id="outline-of-approach">Outline of Approach</h2>
+<p>In this section we give a high level overview of how our toolchain is setup.</p>
+<p>Here we've made some assumptions and choices on configuration and setup which we hope can be adapted for your requirements and preferences.</p>
+<p>We assume our bug hunting is done with:</p>
+<ul>
+<li>Apple Silicon ARM architecture</li>
+<li>Visual Studio is our editor for querying for, and viewing, results</li>
+<li>XNU Kernel <code>xnu-8792.61.2</code> is being studied</li>
+</ul>
+<p>The top level steps are:</p>
+<ol>
+<li>Setup for Xcode on Mac on Apple Silicon.</li>
+<li>Install the Kernel Debug Kit.</li>
+<li>Obtain download and compilation scripts.</li>
+<li>Setup and install Visual Studio Code, and the QL plug-in.</li>
+<li>Load the Starter Workspace for CodeQL.</li>
+<li>Install CodeQL engine</li>
+<li>Generate XNU CodeQL database.</li>
+<li>Import XNU CodeQL database.</li>
+<li>Run CodeQL queries to find weaknesses and vulnerabilities. </li>
+</ol>
+<h2 id="software-requirements">Software Requirements</h2>
+<p>We need the following software:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Purpose</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xcode</td>
+<td>Compiler</td>
+<td>Mac App Store</td>
+</tr>
+<tr>
+<td>Kernel Debug Kit (13.1 22C65)</td>
+<td>XNU Dependency for compilation</td>
+<td><a href="https://developer.apple.com/download/all/">Apple Download Site</a></td>
+</tr>
+<tr>
+<td><code>xnu-build</code></td>
+<td>Build Scripts for XNU</td>
+<td><a href="https://github.com/pwn0rz/xnu-build">pwn0rz/xnu-build</a></td>
+</tr>
+<tr>
+<td>Visual Studio Code</td>
+<td>Editor/Viewer</td>
+<td><a href="https://code.visualstudio.com">Microsoft VS Code</a></td>
+</tr>
+<tr>
+<td>CodeQL plug-in</td>
+<td>Integration for CodeQL into VS Code</td>
+<td>From <code>Extensions</code> in VS Code; search for <code>CodeQL</code></td>
+</tr>
+<tr>
+<td>CodeQL snippets</td>
+<td>Pre-made queries to run</td>
+<td><a href="https://github.com/github/vscode-codeql-starter/">Starter Workspace</a></td>
+</tr>
+<tr>
+<td>CodeQL CLI</td>
+<td>CodeQL engine binaries</td>
+<td><a href="https://github.com/github/codeql-cli-binaries/releases">Releases</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="install-the-apple-proprietary-base-software">Install the Apple Proprietary base software</h2>
+<p>We assume that as standard, you have installed Xcode on your Apple Silicon Mac.</p>
+<p>Here we use Xcode 14.1.</p>
+<p>In order for the CodeQL engine to run, we also need Command Line Tools for Xcode and Rosetta 2.</p>
+<p>Install Command Line Tools from <a href="https://developer.apple.com/download/all/">Apple Download Site</a> by searching for "Command Line Tools".  Install the edition that matches our installed Xcode version, 14.1.</p>
+<p>Rosetta 2 is installed upon demand the first time a tool (such as CodeQL) requires it.  But it is possible to put it in place beforehand with the command
+<div class="highlight"><pre><span></span><code>/usr/sbin/softwareupdate<span class="w"> </span>--install-rosetta<span class="w"> </span>--agree-to-license
+</code></pre></div></p>
+<p>Then resources needed in order to compile the XNU kernel are provided by the Kernel Debug Kit.  The kernel evolves rapidly over time, and particularly after a new product release, a bulk update can often been seen in the XNU sources.  There is a tight coupling between the version of the KDK and the XNU kernel that is compiled using it.  Expect to have to do hacks and tweaks if this document is being read sometime after the versions we specify here.</p>
+<p>To get the currently most recent KDK, visit the <a href="https://developer.apple.com/download/all/">Apple Download Site</a> and search for "Kernel Debug Kit".
+Specifically we use <a href="https://download.developer.apple.com/macOS/Kernel_Debug_Kit_13.1_build_22C65/Kernel_Debug_Kit_13.1_build_22C65.dmg">13.1 build 22C65</a> in this tutorial.</p>
+<p>Once the KDK is downloaded and installed, it will be present on your machine, and can be confirmed using:
+<div class="highlight"><pre><span></span><code>mdfind<span class="w"> </span>.kdk
+/Library/Apple/System/Library/Receipts/com.apple.pkg.KDK.22C65.bom
+/Library/Apple/System/Library/Receipts/com.apple.pkg.KDK.22C65.plist
+/Library/Developer/KDKs/KDK_13.1_22C65.kdk
+</code></pre></div></p>
+<p>Note that in an earlier chapter, we used the KDK because we wanted to actually do Kernel Debugging.  Here, we use KDK only to facilitate XNU kernel compilation.</p>
+<p>It is worthwhile, whilst we are here, to look inside the KDK subdirectories because it is like Polyfilla (TM).  It has many binary components that fill gaps in the open source XNU in order to make a complete system.  This would either be to hide details of Apple-custom hardware, or avoid third party intellectual property issues preventing Apple from releasing the source code.</p>
+<h2 id="build-xnu-kernel">Build XNU kernel</h2>
+<p>Installing all the prerequisite software modules that the XNU kernel requires, as well as patching up small differences needed due to our compilation being done outside of Apple (and thus not using their internal SDK) is non-trivial.  Fortunately the heavy-lifting has already been done by <code>pwn0rz</code> with repository <a href="https://github.com/pwn0rz/xnu-build">pwn0rz/xnu-build</a>.  In this tutorial we are using it at commit <code>6b5c72cfb5a9a9ad8b5e9e245dbd00f331d37259</code>.</p>
+<ol>
+<li>Clone the repository <a href="https://github.com/pwn0rz/xnu-build">pwn0rz/xnu-build</a>.</li>
+<li>Ensure a modern Python is present on your system, e.g. Python 3.10.8</li>
+<li>Run the script that fetches and compiles the source code
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>xnu-build
+./x.py<span class="w"> </span>&gt;<span class="w"> </span>x-py-output.txt<span class="w"> </span><span class="m">2</span>&gt;x-py-err.txt
+</code></pre></div></li>
+</ol>
+<p>It is worthwhile trying to exactly match the software being used here to see it working in at least one configuration.  Then on later versions of the XNU kernel, some idea of what "normal" looks like is already in mind, and iterative debugging can be done to get the kernel to compile.  There is no single long term solution here since the XNU source code is kind of "thrown over the wall" to the community.  It is not a project which comes associated with a governance and community leadership aspect from Apple.  To be fair, we should be grateful that it even exists.</p>
+<p>In our case, our case, out compile never completely succeeds.  But it is not really a problem because the above configuration gets us what we require - a set of intermediate binary objects that then can be explored and inspected with CodeQL later along.</p>
+<p>Our output files can be cross-compared from <a href="../Bibliography/#TRTZ">The Road to Zero GitHub</a>, in directory <code>examples/compile_xnu</code>.</p>
+<h2 id="setup-visual-studio-code">Setup Visual Studio Code</h2>
+<p>We assume you have setup Visual Studio Code, <a href="https://code.visualstudio.com">Microsoft VS Code</a> 
+When running this tool, with the "Activity Bar" on the left visible, or Shift+Command+X, the extensions panel can be raised.
+Search for extension "CodeQL" (the author is GitHub and should be the first match).  Then install it.</p>
+<p>At this point we have a CodeQL extension installed, but no actual CodeQL engine (called the CodeQL CLI) that it can call.</p>
+<p>Furthermore, CodeQL needs two more items to be effective.  Firstly it needs rules (a ruleset) that it can execute to find code weaknesses and bugs.  Secondly, it needs a database file that indexes the code base it should search within.</p>
+<p>In order to get the ruleset, recursively clone the repository <a href="https://github.com/github/vscode-codeql-starter/">Starter Workspace</a>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--recursive<span class="w"> </span>https://github.com/github/vscode-codeql-starter
+</code></pre></div></p>
+<p>Identify the location of the checked out file, <code>vscode-codeql-starter.code-workspace</code> from the above repository.
+In Visual Studio Code, choose "File -&gt; Open Workspace From File..." and select the above workspace file.</p>
+<h2 id="install-codeql-cli">Install CodeQL CLI</h2>
+<p>The engine that runs CodeQL is called the CodeQL CLI.  These are offered as binaries.  In order for our configuration to work we require Xcode command-line developer tools and Rosetta 2 are installed.  These were installed earlier.</p>
+<p>Download the CodeQL CLI via the release binaries.  Here we are using <a href="https://github.com/github/codeql-cli-binaries/releases/download/v2.11.6/codeql-osx64.zip">codeql-osx64.zip version 2.11.6</a>.  The latest version is at <a href="https://github.com/github/codeql-cli-binaries/releases">CodeQL Releases</a></p>
+<p>Place the downloaded codeql into a place which is reachable by your shell PATH variable.  E.g. for <code>zsh</code> users it would be:
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/tools
+mv<span class="w"> </span>~/Downloads/codeql<span class="w"> </span>~/tools
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;PATH=</span><span class="nv">$PATH</span><span class="s2">:~/tools&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>~/.zprofile
+.<span class="w"> </span>~/.zprofile
+</code></pre></div></p>
+<p>and check the installed command:
+<div class="highlight"><pre><span></span><code>~<span class="w"> </span>codeql<span class="w"> </span>--version
+CodeQL<span class="w"> </span>command-line<span class="w"> </span>toolchain<span class="w"> </span>release<span class="w"> </span><span class="m">2</span>.11.6.
+Copyright<span class="w"> </span><span class="o">(</span>C<span class="o">)</span><span class="w"> </span><span class="m">2019</span>-2022<span class="w"> </span>GitHub,<span class="w"> </span>Inc.
+Unpacked<span class="w"> </span><span class="k">in</span>:<span class="w"> </span>/Users/faisalm/tools/codeql
+<span class="w">   </span>Analysis<span class="w"> </span>results<span class="w"> </span>depend<span class="w"> </span>critically<span class="w"> </span>on<span class="w"> </span>separately<span class="w"> </span>distributed<span class="w"> </span>query<span class="w"> </span>and
+<span class="w">   </span>extractor<span class="w"> </span>modules.<span class="w"> </span>To<span class="w"> </span>list<span class="w"> </span>modules<span class="w"> </span>that<span class="w"> </span>are<span class="w"> </span>visible<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>toolchain,
+<span class="w">   </span>use<span class="w"> </span><span class="s1">&#39;codeql resolve qlpacks&#39;</span><span class="w"> </span>and<span class="w"> </span><span class="s1">&#39;codeql resolve languages&#39;</span>.
+</code></pre></div></p>
+<h2 id="create-the-xnu-codeql-database">Create the XNU CodeQL Database</h2>
+<p>At this point we can go back to our <code>xnu-build</code> repository and run its second shell script.
+<div class="highlight"><pre><span></span><code>.<span class="w"> </span>~/.zprofile<span class="w"> </span><span class="c1"># Just in case we have not picked up codeql in the PATH yet</span>
+./ql.py<span class="w"> </span>&gt;<span class="w"> </span>ql-py-output.txt<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>ql-py-err.txt<span class="w"> </span>
+</code></pre></div></p>
+<p>Our output files can be cross-compared from <a href="../Bibliography/#TRTZ">The Road to Zero GitHub</a>, in directory <code>examples/codeql_database_generation</code>.
+Make a note of the newly created directory, <code>xnu-codeql</code> because this is referenced in a later step.</p>
+<h2 id="import-the-xnu-codeql-database">Import the XNU CodeQL Database</h2>
+<p>From the Left Hand panel of Visual Studio Code, click the Dots menu and select CodeQL to show it.</p>
+<p><img alt="VSCodeCodeQL" src="../vscodeCodeQL.png" /></p>
+<p>From here we can "Add a CodeQL Database from a folder".  We pick the <code>xnu-codeql</code> folder we generated in the previous section. (It will be a subdirectory of <code>xnu-build</code>.)</p>
+<p>When this is done we see that the CPP (C++) database <code>xnu-codeql</code> is seen with a tick mark in the Left Panel section marked "DATABASES".
+<img alt="ImportedDatabase" src="../importedDatabase.png" /></p>
+<h2 id="run-a-query">Run a Query</h2>
+<p>We now need to switch our view from the CodeQL plug-in view to the normal folders view.</p>
+<p><img alt="QLFilesInStarterProject" src="../qlFilesInStarterProject.png" /></p>
+<p>As a consequence of the recursive clone made for the starter project earlier, we should have a folder called <code>ql</code> as seen in the above screenshot.</p>
+<p>We need to drill down into <code>ql/cpp/ql/src/Security/CWE/CWE-014</code> to find a directory showing some sample code, and a <code>.ql</code> file for finding such examples.  Right Clicking on <code>MemsetMayBeDeleted.ql</code> and selecting "Run Query" will execute the query against our database, which is the XNU kernel.</p>
+<p>Unfortunately it will not result in any matches because the code does not have such a flaw.</p>
+<h2 id="run-a-batch-of-queries">Run a Batch of Queries</h2>
+<p>We can select at a folder level and choose to run a batch of queries.  The CodeQL tool will find all <code>.ql</code> files in the file hierarchy and run each in turn.  For example Right Clicking on <code>ql/cpp/ql/src/Likely Bugs/Memory Management</code> will run memory management checks.  Unfortunately again, there are no matched returned results because the source base does not have such flaws.</p>
+<p>As we mentioned in our earlier section, there can be query limits we reach.  These limits can be extended.</p>
+<p>We need to update the workspace file <code>vscode-codeql-starter.code-workspace</code> to support for example 128 queries (instead of the default 64):
+<div class="highlight"><pre><span></span><code> &quot;settings&quot;: {
+    &quot;omnisharp.autoStart&quot;: false,
+    &quot;codeQL.runningQueries.maxQueries&quot;: 128
+  }
+</code></pre></div></p>
+<h2 id="next-steps">Next Steps</h2>
+<p>We have shown a powerful tool that can be used to inspect the XNU kernel source, and shown how we can get the source code and compile it.</p>
+<p>What remains is to explore the CodeQL query language, and make novel queries.</p>
+<p>We could draw inspiration from past bug fixes to see if other instances are present by crafting a query that would match the past bug fix.</p>
+<p>Alternatively we could run some of the "noise" queries, such as the empty block query we presented earlier in this chapter.  This can lead to insights and further refinement to get a good query that could find a flaw.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.bd41221c.min.js"></script>
+      
+    
+  </body>
+</html>
